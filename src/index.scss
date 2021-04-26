@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-code {
+  background: url('assets/home-bg.jpg');
+}
+
+.dropdown:before, .dropdown:after {
+  content: '';
+  @apply absolute z-20 top-2.5 right-2 w-0 h-0 pointer-events-none border-4 border-dashed border-transparent;
+}
+
+.dropdown:before {
+  border-bottom-style: solid;
+  border-bottom-color: rgb(229, 231, 235);
+  border-top: none;
+}
+
+.dropdown:after {
+  @apply mt-2;
+  border-top-style: solid;
+  border-top-color: rgb(229, 231, 235);
+  border-bottom: none;
+}
+
+.dropdown-select {
+  width: 130%;
+}
+
+.dropdown-select:focus {
+  @apply z-10 w-full border-none ring-0;
+}
+
+.firepad {
+  @apply flex flex-col flex-1 w-full;
+}
+
+/* Dirty fix for Firefox adding padding where it shouldn't. */
+@-moz-document url-prefix() {
+  .dropdown-select {
+    padding-left: 6px;
+  }
+}
+
+.powered-by-firepad {
+  display: none;
+}
