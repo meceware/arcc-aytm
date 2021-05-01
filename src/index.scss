@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .bg-code {
-  background: url('assets/home-bg.jpg');
+  background-image: url('assets/home-bg.jpg');
 }
 
 .dropdown:before, .dropdown:after {
