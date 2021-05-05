@@ -45,94 +45,96 @@ class PageEditor extends Component {
     const titleTag = document.getElementsByTagName( 'title' )[ 0 ];
     titleTag.innerHTML = `ARCC - AYTM &bull; ${ this._id }`;
 
-    // If connected before, remove disconnect event
-    this._userDbRef.onDisconnect().remove();
-    // Update user list state event
-    this._userDbRef.getParent().on( 'value', snapshot => {
-      const val = snapshot ? snapshot.val() : false;
-      if ( val ) {
-        this.setState( {
-          userList: val,
-        } );
-      }
-    } );
-
-    // Update language state event
-    this._firepadDbRef.child( 'lang' ).on( 'value', snapshot => {
-      const val = snapshot ? snapshot.val() : false;
-      if ( val ) {
-        this.setState( {
-          language: val,
-        } );
-      }
-    } );
-
-    // Update destroyed state event
-    this._firepadDbRef.child( 'destroyed' ).on( 'value', snapshot => {
-      const val = snapshot ? snapshot.val() : false;
-      if ( val ) {
-        this.setState( {
-          destroyed: val,
-        } );
-      }
-    } );
-
-    // Create the editor
-    if ( this._ace.ref ) {
-      const editor = window.ace.edit( this._ace.ref );
-      editor.session.setMode( `ace/mode/${ this.state.language }` );
-      editor.session.setTabSize( 2 );
-      editor.session.setUseWrapMode( true );
-      editor.renderer.setScrollMargin( 2, 2 );
-      editor.renderer.setPadding( 2 );
-      editor.$blockScrolling = Infinity;
-      editor.setOptions( {
-        enableBasicAutocompletion: true,
-        enableEmmet: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: false,
-        showGutter: true,
-        highlightGutterLine: true,
-        showPrintMargin: false,
-        vScrollBarAlwaysVisible: false,
-        wrap: false,
-        theme: 'ace/theme/textmate',
-        fontSize: '15px',
-        useSoftTabs: true,
-        tabSize: 4,
+    window.firebase.auth().signInAnonymously().then( () => {
+      // If connected before, remove disconnect event
+      this._userDbRef.onDisconnect().remove();
+      // Update user list state event
+      this._userDbRef.getParent().on( 'value', snapshot => {
+        const val = snapshot ? snapshot.val() : false;
+        if ( val ) {
+          this.setState( {
+            userList: val,
+          } );
+        }
       } );
 
-      this._ace.instance = editor;
-      // Connect firepad to the editor
-      this._firepad = window.Firepad.fromACE( this._firepadDbRef, editor, {
-        userId: this._userId,
-        defaultText: [ '#include <iostream>',
-          '',
-          'int main(void) {',
-          '  std::cout << "Hello World!" << std::endl;',
-          '  return 0;',
-          '}',
-        ].join( '\n' ),
+      // Update language state event
+      this._firepadDbRef.child( 'lang' ).on( 'value', snapshot => {
+        const val = snapshot ? snapshot.val() : false;
+        if ( val ) {
+          this.setState( {
+            language: val,
+          } );
+        }
       } );
 
-      // Firepad ready event
-      this._firepad.on( 'ready', () => {
-        this.setState( {
-          // Set user
-          user: {
-            id: this._userId,
+      // Update destroyed state event
+      this._firepadDbRef.child( 'destroyed' ).on( 'value', snapshot => {
+        const val = snapshot ? snapshot.val() : false;
+        if ( val ) {
+          this.setState( {
+            destroyed: val,
+          } );
+        }
+      } );
+
+      // Create the editor
+      if ( this._ace.ref ) {
+        const editor = window.ace.edit( this._ace.ref );
+        editor.session.setMode( `ace/mode/${ this.state.language }` );
+        editor.session.setTabSize( 2 );
+        editor.session.setUseWrapMode( true );
+        editor.renderer.setScrollMargin( 2, 2 );
+        editor.renderer.setPadding( 2 );
+        editor.$blockScrolling = Infinity;
+        editor.setOptions( {
+          enableBasicAutocompletion: true,
+          enableEmmet: true,
+          enableSnippets: true,
+          enableLiveAutocompletion: false,
+          showGutter: true,
+          highlightGutterLine: true,
+          showPrintMargin: false,
+          vScrollBarAlwaysVisible: false,
+          wrap: false,
+          theme: 'ace/theme/textmate',
+          fontSize: '15px',
+          useSoftTabs: true,
+          tabSize: 4,
+        } );
+
+        this._ace.instance = editor;
+        // Connect firepad to the editor
+        this._firepad = window.Firepad.fromACE( this._firepadDbRef, editor, {
+          userId: this._userId,
+          defaultText: [ '#include <iostream>',
+            '',
+            'int main(void) {',
+            '  std::cout << "Hello World!" << std::endl;',
+            '  return 0;',
+            '}',
+          ].join( '\n' ),
+        } );
+
+        // Firepad ready event
+        this._firepad.on( 'ready', () => {
+          this.setState( {
+            // Set user
+            user: {
+              id: this._userId,
+              color: this._firepad.firebaseAdapter_.color_,
+              displayName: this._userDisplayName,
+            },
             color: this._firepad.firebaseAdapter_.color_,
-            displayName: this._userDisplayName,
-          },
-          color: this._firepad.firebaseAdapter_.color_,
+          } );
+          editor.resize();
         } );
-        editor.resize();
-      } );
-    } else {
-      this.setState( {
-        error: 'Cannot initialize ACE',
-      } );
-    }
+      } else {
+        this.setState( {
+          error: 'Cannot initialize ACE',
+        } );
+      }
+    } );
   }
 
   shouldComponentUpdate( nextProps, nextState ) {
@@ -175,6 +177,8 @@ class PageEditor extends Component {
 
     this._userDbRef.getParent().off( 'value' );
     this._userDbRef.remove();
+
+    window.firebase.auth().currentUser?.delete();
   }
 
   render() {
