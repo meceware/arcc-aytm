@@ -11,15 +11,13 @@ class PageEditor extends Component {
     this._id = props.match.params.id;
 
     // Database prefix
-    const dbPrefix = `aytm/${ this._id }`;
-    // Generate a user ID
+    this._dbPrefix = `aytm/${ this._id }`;
+    // Generate a user ID temporarily
     this._userId = Math.floor( Math.random() * 9999999999 ).toString();
-    // User database ref path
-    this._userDbRef = FirebaseDB.ref( `${ dbPrefix }/presence/${ this._userId }` );
     // Firepad ref
     this._firepad = {};
     // Firepad database ref path
-    this._firepadDbRef = FirebaseDB.ref( `${ dbPrefix }` );
+    this._firepadDbRef = FirebaseDB.ref( `${ this._dbPrefix }` );
     // Generate user display name
     this._userDisplayName = `Guest ${ Math.floor( Math.random() * 1000 ) }`;
 
@@ -46,6 +44,10 @@ class PageEditor extends Component {
     titleTag.innerHTML = `ARCC - AYTM &bull; ${ this._id }`;
 
     window.firebase.auth().signInAnonymously().then( () => {
+      this._userId = window.firebase.auth().currentUser.uid;
+      // User database ref path
+      this._userDbRef = FirebaseDB.ref( `${ this._dbPrefix }/presence/${ this._userId }` );
+
       // If connected before, remove disconnect event
       this._userDbRef.onDisconnect().remove();
       // Update user list state event
