@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import isFunction from 'lodash/isFunction';
 import { FirebaseDB } from '../../firebase';
 
-class PageEditor extends Component {
+class PageEditorComponent extends Component {
   constructor( props ) {
     super( props );
 
     // Get the ID from the link
-    this._id = props.match.params.id;
+    this._id = props.id;
 
     // Database prefix
     this._dbPrefix = `aytm/${ this._id }`;
@@ -41,7 +41,7 @@ class PageEditor extends Component {
   componentDidMount() {
     // Set page title
     const titleTag = document.getElementsByTagName( 'title' )[ 0 ];
-    titleTag.innerHTML = `ARCC - AYTM &bull; ${ this._id }`;
+    titleTag.innerHTML = `ARCC &bull; ${ this._id }`;
 
     window.firebase.auth().signInAnonymously().then( () => {
       this._userId = window.firebase.auth().currentUser.uid;
@@ -174,11 +174,11 @@ class PageEditor extends Component {
     }
 
     // Remove events
-    this._firepadDbRef.child( 'lang' ).off();
-    this._firepadDbRef.child( 'destroyed' ).off();
+    this._firepadDbRef?.child( 'lang' ).off();
+    this._firepadDbRef?.child( 'destroyed' ).off();
 
-    this._userDbRef.getParent().off( 'value' );
-    this._userDbRef.remove();
+    this._userDbRef?.getParent().off( 'value' );
+    this._userDbRef?.remove();
 
     window.firebase.auth().currentUser?.delete();
   }
@@ -188,14 +188,14 @@ class PageEditor extends Component {
     if ( this.state.error ) {
       console.error( this.state.error );
       return (
-        <Redirect to = '/' />
+        <Navigate to = '/' replace />
       );
     }
 
     // Redirect to homepage if session is destroyed
     if ( this.state.destroyed ) {
       return (
-        <Redirect to = '/' />
+        <Navigate to = '/' replace />
       );
     }
 
@@ -228,11 +228,11 @@ class PageEditor extends Component {
 
     return (
       <div className = 'flex flex-col min-h-screen relative'>
-        <header className = 'flex flex-initial flex-col border border-r-0 border-t-0 border-l-0 border-gray-400 border-solid relative px-4 bg-gray-800' style = { { borderColor: this.state.color } }>
+        <header className = 'flex flex-initial flex-col border-b-4 border-r-0 border-t-0 border-l-0 border-gray-400 border-solid relative px-4 bg-gray-800' style = { { borderColor: this.state.color } }>
           <div className = 'relative select-none flex items-stretch w-full py-1'>
             <div className = 'flex flex-1 justify-start items-center leading-loose text-xl text-gray-100'>
               <Link to = '/'>
-                <h1>ARCC - AYTM</h1>
+                <h1>ARCC</h1>
               </Link>
             </div>
             <div className = 'flex flex-1 justify-center items-center '>
@@ -253,6 +253,7 @@ class PageEditor extends Component {
             <div className = 'flex flex-1 justify-end items-center leading-loose text-base text-gray-100'>
               { Object.keys( this.state.userList ).length }{ eye }<Link to = '/' className = 'text-red-500 ml-4' onClick = { () => {
                 this._firepadDbRef.child( 'destroyed' ).set( true );
+                this._firepadDbRef.child( 'history' ).remove();
               } }>{ powerOff }</Link>
             </div>
           </div>
@@ -266,5 +267,10 @@ class PageEditor extends Component {
     );
   }
 }
+
+const PageEditor = () => {
+  const params = useParams();
+  return ( <PageEditorComponent id = { params.id } /> );
+};
 
 export default PageEditor;

@@ -14,7 +14,7 @@ class PageHome extends Component {
   componentDidMount() {
     // Page title
     const titleTag = document.getElementsByTagName( 'title' )[ 0 ];
-    titleTag.innerHTML = 'ARCC - AYTM &bull; Collaborative Code Editor';
+    titleTag.innerHTML = 'ARCC &bull; Collaborative Code Editor';
   }
 
   render() {
@@ -23,7 +23,7 @@ class PageHome extends Component {
         <div className = 'flex items-center justify-center h-screen bg-gray-900 bg-opacity-80'>
           <div className = 'block p-12 w-full text-center leading-loose text-gray-200'>
             <div>
-              <h1 className = 'font-bold text-4xl leading-loose'>ARCC - AYTM</h1>
+              <h1 className = 'font-bold text-4xl leading-loose'>ARCC</h1>
             </div>
             <p className = 'text-gray-300 text-xl leading-loose'>A real-time collaborative code editor</p>
             <div className = 'block my-6'>

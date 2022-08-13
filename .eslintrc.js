@@ -4,7 +4,6 @@ module.exports = {
     es6: true,
     node: true,
   },
-  parser: "babel-eslint",
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -18,7 +17,7 @@ module.exports = {
     },
     sourceType: "module",
   },
-  plugins: ["babel", "react", "import", "jsx-a11y", "react-hooks"],
+  plugins: ["react", "import", "jsx-a11y", "react-hooks"],
   rules: {
 		"array-bracket-spacing": ["error", "always"],
 		"brace-style": ["error", "1tbs"],
